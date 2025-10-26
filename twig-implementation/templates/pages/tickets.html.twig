@@ -1,0 +1,298 @@
+{% extends "layout/base.html.twig" %}
+
+{% block title %}Ticket Management - TicketFlow{% endblock %}
+
+{% block body %}
+    {% include 'layout/header.html.twig' with {'isLoggedIn': true} %}
+
+    <div class="dashboard-page">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Ticket Management</h1>
+                <button class="btn btn-primary" onclick="openCreateModal()">
+                    <span style="font-size: 1.2rem;">+</span> New Ticket
+                </button>
+            </div>
+
+            <div class="tickets-section">
+                <div class="tickets-header">
+                    <h2 class="section-subtitle">All Tickets (<span id="ticket-count">0</span>)</h2>
+                </div>
+
+                <div id="tickets-container">
+                    {# Tickets will be dynamically loaded here #}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Ticket Modal #}
+    <div id="ticket-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">Create New Ticket</h2>
+                <button class="btn-icon" onclick="closeModal()">
+                    <span style="font-size: 1.5rem;">×</span>
+                </button>
+            </div>
+            <form id="ticketForm" onsubmit="handleSaveTicket(event)">
+                <input type="hidden" id="ticket-id">
+                <div class="form-group">
+                    <label class="form-label">Title *</label>
+                    <input
+                        type="text"
+                        id="ticket-title"
+                        class="form-input"
+                        placeholder="Enter ticket title"
+                        required
+                    />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea
+                        id="ticket-description"
+                        class="form-textarea"
+                        placeholder="Enter ticket description (optional)"
+                    ></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status *</label>
+                    <select id="ticket-status" class="form-select" required>
+                        <option value="open">Open</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Priority</label>
+                    <select id="ticket-priority" class="form-select">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="save-btn">
+                        Create Ticket
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# Delete Confirmation Modal #}
+    <div id="delete-modal" class="modal-overlay hidden">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 class="modal-title">Confirm Delete</h2>
+                <button class="btn-icon" onclick="closeDeleteModal()">
+                    <span style="font-size: 1.5rem;">×</span>
+                </button>
+            </div>
+            <div class="delete-modal-content">
+                <p>Are you sure you want to delete this ticket? This action cannot be undone.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">
+                    Cancel
+                </button>
+                <button class="btn btn-danger" onclick="confirmDelete()">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {% include 'layout/footer.html.twig' %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Check authentication
+    if (!Auth.isAuthenticated()) {
+        Toast.show('Your session has expired — please log in again.', 'error');
+        setTimeout(() => {
+            window.location.href = '/login.php';
+        }, 1000);
+    }
+
+    let currentTicketId = null;
+    let deleteTicketId = null;
+
+    // Load and display tickets
+    function loadTickets() {
+        const tickets = Storage.getTickets();
+        const container = document.getElementById('tickets-container');
+        const countEl = document.getElementById('ticket-count');
+
+        countEl.textContent = tickets.length;
+
+        if (tickets.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <h3>No tickets yet</h3>
+                    <p>Create your first ticket to get started</p>
+                </div>
+            `;
+            return;
+        }
+
+        const ticketsHTML = tickets.map(ticket => `
+            <div class="ticket-card">
+                <div class="ticket-header">
+                    <div>
+                        <h3 class="ticket-title">${escapeHtml(ticket.title)}</h3>
+                        <span class="ticket-status status-${ticket.status}">
+                            ${ticket.status.replace('_', ' ')}
+                        </span>
+                    </div>
+                </div>
+                ${ticket.description ? `<p class="ticket-description">${escapeHtml(ticket.description)}</p>` : ''}
+                <div class="ticket-actions">
+                    <button class="btn btn-secondary btn-small" onclick="openEditModal('${ticket.id}')">
+                        <span>✎</span> Edit
+                    </button>
+                    <button class="btn btn-danger btn-small" onclick="openDeleteModal('${ticket.id}')">
+                        <span>🗑</span> Delete
+                    </button>
+                </div>
+            </div>
+        `).join('');
+
+        container.innerHTML = `<div class="tickets-grid">${ticketsHTML}</div>`;
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Open create modal
+    function openCreateModal() {
+        currentTicketId = null;
+        document.getElementById('modal-title').textContent = 'Create New Ticket';
+        document.getElementById('save-btn').textContent = 'Create Ticket';
+        document.getElementById('ticketForm').reset();
+        document.getElementById('ticket-id').value = '';
+        Validation.clearAllErrors('ticketForm');
+        document.getElementById('ticket-modal').classList.remove('hidden');
+    }
+
+    // Open edit modal
+    function openEditModal(ticketId) {
+        const ticket = Storage.getTicketById(ticketId);
+        if (!ticket) return;
+
+        currentTicketId = ticketId;
+        document.getElementById('modal-title').textContent = 'Edit Ticket';
+        document.getElementById('save-btn').textContent = 'Update Ticket';
+        document.getElementById('ticket-id').value = ticketId;
+        document.getElementById('ticket-title').value = ticket.title;
+        document.getElementById('ticket-description').value = ticket.description || '';
+        document.getElementById('ticket-status').value = ticket.status;
+        document.getElementById('ticket-priority').value = ticket.priority || 'medium';
+        Validation.clearAllErrors('ticketForm');
+        document.getElementById('ticket-modal').classList.remove('hidden');
+    }
+
+    // Close modal
+    function closeModal() {
+        document.getElementById('ticket-modal').classList.add('hidden');
+        document.getElementById('ticketForm').reset();
+        currentTicketId = null;
+    }
+
+    // Handle save ticket
+    function handleSaveTicket(event) {
+        event.preventDefault();
+        
+        // Clear previous errors
+        Validation.clearAllErrors('ticketForm');
+
+        const title = document.getElementById('ticket-title').value;
+        const description = document.getElementById('ticket-description').value;
+        const status = document.getElementById('ticket-status').value;
+        const priority = document.getElementById('ticket-priority').value;
+
+        let hasError = false;
+
+        // Validate title
+        if (!Validation.isRequired(title)) {
+            Validation.showError('ticket-title', 'Title is required');
+            hasError = true;
+        }
+
+        // Validate status
+        if (!Validation.isValidStatus(status)) {
+            Validation.showError('ticket-status', 'Status must be open, in_progress, or closed');
+            hasError = true;
+        }
+
+        if (hasError) return;
+
+        const ticketData = {
+            title: title.trim(),
+            description: description.trim(),
+            status,
+            priority
+        };
+
+        if (currentTicketId) {
+            // Update existing ticket
+            Storage.updateTicket(currentTicketId, ticketData);
+            Toast.show('Ticket updated successfully!', 'success');
+        } else {
+            // Create new ticket
+            Storage.addTicket(ticketData);
+            Toast.show('Ticket created successfully!', 'success');
+        }
+
+        closeModal();
+        loadTickets();
+    }
+
+    // Open delete modal
+    function openDeleteModal(ticketId) {
+        deleteTicketId = ticketId;
+        document.getElementById('delete-modal').classList.remove('hidden');
+    }
+
+    // Close delete modal
+    function closeDeleteModal() {
+        document.getElementById('delete-modal').classList.add('hidden');
+        deleteTicketId = null;
+    }
+
+    // Confirm delete
+    function confirmDelete() {
+        if (!deleteTicketId) return;
+
+        Storage.deleteTicket(deleteTicketId);
+        Toast.show('Ticket deleted successfully!', 'success');
+        closeDeleteModal();
+        loadTickets();
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', loadTickets);
+
+    // Close modal when clicking outside
+    document.getElementById('ticket-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    document.getElementById('delete-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDeleteModal();
+        }
+    });
+</script>
+{% endblock %}

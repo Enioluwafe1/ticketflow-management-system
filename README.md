@@ -93,10 +93,7 @@ All implementations use shared resources from the `assets/` directory:
 ✅ Responsive design
 ✅ Accessibility compliance
 
-## 👨‍💻 Author
+## 👨‍💻 Odunayo Enioluwafe
 
 Built as a comprehensive demonstration of multi-framework development expertise.
 
-## 📄 License
-
-MIT License

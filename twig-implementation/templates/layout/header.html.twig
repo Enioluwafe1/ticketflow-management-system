@@ -1,0 +1,39 @@
+<header class="header">
+    <div class="container">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <span style="font-size: 1.8rem;">📷</span>
+                TicketFlow
+            </a>
+            <nav class="nav-buttons">
+                {% if isLoggedIn %}
+                    <span class="user-name" id="user-name"></span>
+                    <button class="btn btn-danger" onclick="handleLogout()">
+                        <span>⎋</span> Logout
+                    </button>
+                {% else %}
+                    <a href="/login.php" class="btn btn-secondary">Login</a>
+                    <a href="/signup.php" class="btn btn-primary">Get Started</a>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+</header>
+
+{% if isLoggedIn %}
+<script>
+    // Display logged-in user name
+    const session = Auth.getSession();
+    if (session) {
+        document.getElementById('user-name').textContent = session.user.name;
+    }
+
+    function handleLogout() {
+        Auth.logout();
+        Toast.show('Logged out successfully', 'success');
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 500);
+    }
+</script>
+{% endif %}

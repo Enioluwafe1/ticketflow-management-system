@@ -1,0 +1,95 @@
+{% extends "layout/base.html.twig" %}
+
+{% block title %}Login - TicketFlow{% endblock %}
+
+{% block body %}
+    <div class="auth-page">
+        <div class="decorative-circle auth-circle-1"></div>
+        <div class="decorative-circle auth-circle-2"></div>
+        <div class="auth-card">
+            <h1 class="auth-title">Welcome Back</h1>
+            <p class="auth-subtitle">Login to access your dashboard</p>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        class="form-input"
+                        placeholder="you@example.com"
+                        required
+                    />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        class="form-input"
+                        placeholder="Enter your password"
+                        required
+                    />
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    Login
+                </button>
+            </form>
+            <div class="auth-link">
+                Don't have an account? <a href="/signup.php">Sign up</a>
+            </div>
+            <div class="auth-link">
+                <small>Test credentials: any email + password (min 6 chars)</small>
+            </div>
+        </div>
+    </div>
+
+    {% include 'layout/footer.html.twig' %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function handleLogin(event) {
+        event.preventDefault();
+        
+        // Clear previous errors
+        Validation.clearAllErrors('loginForm');
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        let hasError = false;
+        
+        // Validate email
+        if (!Validation.isRequired(email)) {
+            Validation.showError('email', 'Email is required');
+            hasError = true;
+        } else if (!Validation.isValidEmail(email)) {
+            Validation.showError('email', 'Email is invalid');
+            hasError = true;
+        }
+        
+        // Validate password
+        if (!Validation.isRequired(password)) {
+            Validation.showError('password', 'Password is required');
+            hasError = true;
+        } else if (!Validation.minLength(password, 6)) {
+            Validation.showError('password', 'Password must be at least 6 characters');
+            hasError = true;
+        }
+        
+        if (hasError) return;
+        
+        // Attempt login
+        const result = Auth.login(email, password);
+        
+        if (result.success) {
+            Toast.show('Login successful! Welcome back.', 'success');
+            setTimeout(() => {
+                window.location.href = '/dashboard.php';
+            }, 500);
+        } else {
+            Toast.show(result.error, 'error');
+        }
+    }
+</script>
+{% endblock %}
