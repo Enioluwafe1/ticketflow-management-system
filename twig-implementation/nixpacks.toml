@@ -1,0 +1,13 @@
+cat > nixpacks.toml << 'EOF'
+[phases.setup]
+nixPkgs = ["php81", "php81Packages.composer"]
+
+[phases.install]
+cmds = ["composer install --no-dev --optimize-autoloader --no-interaction"]
+
+[phases.build]
+cmds = ["composer dump-autoload --optimize"]
+
+[start]
+cmd = "cd public && php -S 0.0.0.0:$PORT"
+EOF
