@@ -1,23 +1,24 @@
-# Use official PHP image
-FROM php:8.1-cli
+# Use PHP 8.2 (or adjust if your project specifically needs 8.1)
+FROM php:8.2-cli
 
-# Install Composer
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    zip \
+    && docker-php-ext-install pdo pdo_mysql
+
+# Copy composer binary
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /app
 
-# Copy composer files first (for caching)
+# Copy composer files first for caching
 COPY composer.json composer.lock* ./
 
-# Install dependencies
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Copy application files
+# Copy the rest of the application files
 COPY . .
-
-# Expose port
-EXPOSE 10000
-
-# Start PHP server
-CMD ["php", "-S", "0.0.0.0:10000", "-t", "public"]
