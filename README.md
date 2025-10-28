@@ -2,17 +2,33 @@
 
 A professional ticket management system implemented in **React**, **Vue.js**, and **Twig** to demonstrate framework-agnostic design principles and full-stack capabilities.
 
-## 🎯 Project Overview
+## 🌐 Live Demos
 
-This monorepo contains three complete implementations of the same ticket management application, each using a different frontend technology while maintaining identical UI/UX and functionality.
+| Framework | Live URL | Repository |
+|-----------|----------|------------|
+| **React** | [https://ticketflow-app-react.netlify.app](https://ticketflow-app-react.netlify.app) | [View Code](https://github.com/Enioluwafe1/ticketflow-management-system/tree/main/react-implementation) |
+| **Vue.js** | [https://ticketflow-app-vue.netlify.app](https://ticketflow-app-vue.netlify.app) | [View Code](https://github.com/Enioluwafe1/ticketflow-management-system/tree/main/vue-implementation) |
+| **Twig** | [https://ticketflow-management-system.onrender.com](https://ticketflow-management-system.onrender.com) | [View Code](https://github.com/Enioluwafe1/ticketflow-management-system/tree/main/twig-implementation) |
 
 ## 📦 Implementations
 
-| Framework | Technology | Status | Directory |
-|-----------|-----------|---------|-----------|
-| React | React 18 + Hooks | ✅ Complete | [react-implementation/](./react-implementation/) |
-| Vue | Vue 3 + Composition API | 🚧 In Progress | [vue-implementation/](./vue-implementation/) |
-| Twig | Twig + Vanilla JS | ⏳ Pending | [twig-implementation/](./twig-implementation/) |
+### React Implementation
+- **Tech Stack:** React 18, Vite, Lucide Icons
+- **Features:** Hooks, Component Architecture, Client-side Routing
+- **Deploy:** Netlify
+- **Branch:** `deploy-react`
+
+### Vue Implementation
+- **Tech Stack:** Vue 3, Vite, Composition API
+- **Features:** SFC, Reactive State, Scoped Styles
+- **Deploy:** Netlify
+- **Branch:** `deploy-vue`
+
+### Twig Implementation
+- **Tech Stack:** Twig 3, PHP 8+, Vanilla JS
+- **Features:** Server-side Rendering, Template Inheritance
+- **Deploy:** Render
+- **Branch:** `deploy-twig`
 
 ## ✨ Features
 
@@ -26,74 +42,78 @@ This monorepo contains three complete implementations of the same ticket managem
 
 ## 🚀 Quick Start
 
-### React Implementation
+### React
 ```bash
 cd react-implementation
 npm install
-npm start
+npm run dev
 ```
 
-### Vue Implementation
+### Vue
 ```bash
 cd vue-implementation
 npm install
 npm run dev
 ```
 
-### Twig Implementation
+### Twig
 ```bash
 cd twig-implementation
 composer install
-php -S localhost:8000 -t public
+cd public && php -S localhost:8000
 ```
+
+## 🔐 Test Credentials
+
+- **Email:** Any valid email (e.g., `test@example.com`)
+- **Password:** Minimum 6 characters (e.g., `password123`)
 
 ## 📁 Repository Structure
 ```
 ticketflow-management-system/
-├── assets/              # Shared resources (SVGs, design tokens)
-├── react-implementation/
-├── vue-implementation/
-├── twig-implementation/
-└── docs/               # Additional documentation
+├── react-implementation/    # React + Vite
+├── vue-implementation/      # Vue 3 + Vite
+├── twig-implementation/     # Twig + PHP
+├── assets/                  # Shared design assets
+└── docs/                    # Documentation
 ```
-
-## 🎨 Shared Assets
-
-All implementations use shared resources from the `assets/` directory:
-- Wave divider SVG
-- Design tokens (colors, spacing)
-- Logo and icons
-
-## 🔐 Test Credentials
-
-- **Email:** Any valid email (e.g., test@example.com)
-- **Password:** Minimum 6 characters (e.g., password123)
 
 ## 🛠️ Technologies
 
 ### React
-- React 18, Lucide Icons, LocalStorage
+- React 18, Vite 5, Lucide React, LocalStorage
 
 ### Vue
-- Vue 3, Vite, Composition API
+- Vue 3, Vite 5, Composition API, Lucide Vue Next
 
 ### Twig
-- Twig 3, PHP 8+, Vanilla JavaScript
+- Twig 3, PHP 8.1+, Vanilla JavaScript, LocalStorage
 
 ## 📋 Task Compliance
 
-✅ Landing page with wavy SVG background
-✅ Authentication with validation
-✅ Dashboard with statistics
-✅ Complete CRUD operations
-✅ Form validation (title, status required)
-✅ Error handling with toast notifications
-✅ Protected routes with session tokens
-✅ Max-width 1440px centered layout
-✅ Responsive design
-✅ Accessibility compliance
+✅ Landing page with wavy SVG background  
+✅ Authentication with validation  
+✅ Dashboard with statistics  
+✅ Complete CRUD operations  
+✅ Form validation (title, status required)  
+✅ Error handling with toast notifications  
+✅ Protected routes with session tokens  
+✅ Max-width 1440px centered layout  
+✅ Responsive design  
+✅ Accessibility compliance  
 
-## 👨‍💻 Odunayo Enioluwafe
+## 🌟 Deployment
 
-Built as a comprehensive demonstration of multi-framework development expertise.
+### Netlify (React & Vue)
+- Automatic deployments on push to `deploy-react` and `deploy-vue` branches
+- Build command: `npm run build`
+- Publish directory: `dist`
 
+### Render (Twig)
+- Automatic deployments on push to `deploy-twig` branch
+- Build command: `composer install`
+- Start command: `php -S 0.0.0.0:$PORT -t public`
+
+---
+
+**Built to demonstrate multi-framework expertise and professional development standards**
