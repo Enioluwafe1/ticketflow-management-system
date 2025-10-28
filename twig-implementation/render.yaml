@@ -1,9 +1,10 @@
 services:
   - type: web
     name: ticketflow-twig
-    env: php
-    buildCommand: composer install --no-dev --optimize-autoloader
-    startCommand: php -S 0.0.0.0:$PORT -t public
+    env: docker
+    region: oregon
+    plan: free
+    dockerfilePath: ./Dockerfile
     envVars:
-      - key: PHP_VERSION
-        value: "8.1"
+      - key: PORT
+        value: 10000

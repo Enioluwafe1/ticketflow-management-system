@@ -3,12 +3,23 @@
     "description": "TicketFlow Ticket Management System - Twig Implementation",
     "type": "project",
     "require": {
-        "php": ">=8.1",
+        "php": "^8.1",
         "twig/twig": "^3.0"
     },
     "autoload": {
         "psr-4": {
             "App\\": "src/"
         }
+    },
+    "config": {
+        "platform": {
+            "php": "8.1"
+        },
+        "optimize-autoloader": true
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@php -v"
+        ]
     }
 }
