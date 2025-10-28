@@ -1,4 +1,3 @@
-cat > railway.toml << 'EOF'
 [build]
 builder = "nixpacks"
 
@@ -6,4 +5,3 @@ builder = "nixpacks"
 startCommand = "cd public && php -S 0.0.0.0:$PORT"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
-EOF
