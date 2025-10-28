@@ -22,3 +22,9 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Copy the rest of the application files
 COPY . .
+
+# Expose the port Render expects
+EXPOSE 10000
+
+# Start the PHP built-in server on Render's assigned port
+CMD ["php", "-S", "0.0.0.0:10000", "-t", "public"]
